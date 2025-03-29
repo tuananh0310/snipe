@@ -35,7 +35,8 @@ RUN  apk add --no-cache \
         vim \
         git \
         mysql-client \
-        tini
+        tini \
+        sudo
 
 COPY docker/column-statistics.cnf /etc/mysql/conf.d/column-statistics.cnf
 
@@ -56,16 +57,9 @@ COPY docker/docker.env /var/www/html/.env
 
 RUN chown -R apache:apache /var/www/html
 
-RUN \
-	rm -r "/var/www/html/storage/private_uploads" \
-	&& mkdir -p "/var/lib/snipeit/data/private_uploads" && ln -fs "/var/lib/snipeit/data/private_uploads" "/var/www/html/storage/private_uploads" \
-    && rm -rf "/var/www/html/public/uploads" \
-    && mkdir -p "/var/lib/snipeit/data/uploads" && ln -fs "/var/lib/snipeit/data/uploads" "/var/www/html/public/uploads" \
-    && mkdir -p "/var/lib/snipeit/dumps" && rm -r "/var/www/html/storage/app/backups" && ln -fs "/var/lib/snipeit/dumps" "/var/www/html/storage/app/backups" \
-    && mkdir -p "/var/lib/snipeit/keys" && ln -fs "/var/lib/snipeit/keys/oauth-private.key" "/var/www/html/storage/oauth-private.key" \
-    && ln -fs "/var/lib/snipeit/keys/oauth-public.key" "/var/www/html/storage/oauth-public.key" \
-    && chown -hR apache "/var/www/html/storage/" \
-    && chown -R apache "/var/lib/snipeit"
+# Set permissions
+RUN find /var/www/html -type d -exec chmod 755 {} \; \
+    && find /var/www/html -type f -exec chmod 644 {} \;
 
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

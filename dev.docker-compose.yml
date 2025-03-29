@@ -19,7 +19,8 @@ services:
         restart: true
     env_file:
       - .env.dev.docker
-
+    volumes:
+      - /Users/macbook/WorkSpace/Snipe/snipe-it:/var/www/html
   mariadb:
     image: mariadb:11.5.2
     volumes:
